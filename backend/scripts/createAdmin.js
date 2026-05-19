@@ -1,39 +1,45 @@
 import mongoose from "mongoose";
-import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
-
-import connectDb from "../config/db";
+import "dotenv/config";
 import User from "../models/User.js";
 
-dotenv.config();
+const createAdmin = async () => {
+  try {
+    // ✅ Connect DB directly (simple & reliable)
+    await mongoose.connect(process.env.MONGO_URL);
+    console.log("✅ MongoDB Connected");
 
-const createAdmin = async()=>{
-    try {
-        await connectDb;
-
-        const existingAdmin = await User.findOne({role:"admin"});
-
-        if(existingAdmin){
-            console.log("Admin already exists");
-            process.exit();
-        }
-
-        const salt = await bcrypt.genSalt(process.env.HASH_KEY||10);
-        const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD,salt);
-
-        const admin = await User.create({
-            username:process.env.ADMIN_USERNAME,
-            password:hashedPassword,
-            role:"admin"
-        });
-        
-        console.log("Admin created succesfully");
-        console.log(admin);
-        process.exit();
-    } catch (error) {
-        console.error("Error creating admin:", error.message);
-        process.exit(1);
+    // ✅ Ensure only ONE admin
+    const existing = await User.findOne({ role: "admin" });
+    if (existing) {
+      console.log("❌ Admin already exists:", existing.username);
+      process.exit(0);
     }
+
+    // ✅ Validate env
+    if (!process.env.ADMIN_USERNAME || !process.env.ADMIN_PASSWORD) {
+      throw new Error("Missing ADMIN_USERNAME or ADMIN_PASSWORD in .env");
+    }
+
+    // ✅ Hash password (clean approach)
+    const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD, 12);
+
+    // ✅ Create admin
+    const admin = await User.create({
+      username: process.env.ADMIN_USERNAME,
+      password: hashedPassword,
+      role: "admin",
+    });
+
+    console.log("✅ Admin created successfully");
+    console.log("👤 Username:", admin.username);
+    console.log("🔑 Password:", process.env.ADMIN_PASSWORD);
+
+    process.exit(0);
+  } catch (error) {
+    console.error("❌ Error:", error.message);
+    process.exit(1);
+  }
 };
 
 createAdmin();
