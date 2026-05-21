@@ -1,7 +1,7 @@
 import Student from "../models/Student.js";
 import Room from "../models/Room.js";
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const serverError = (res, err) =>
     res.status(500).json({ success: false, message: err.message });
@@ -103,21 +103,22 @@ export const deleteStudent = async (req, res) => {
 };
 
 /**
- * PATCH /students/change-room
+ * PATCH /students/:id/room
  * Move a student to a different room within the same hostel.
  */
 export const changeRoom = async (req, res) => {
     try {
-        const { studentId, newRoomId } = req.body;
+        const { id } = req.params;       // MongoDB _id of the student
+        const { newRoomId } = req.body;
 
-        if (!studentId || !newRoomId) {
+        if (!newRoomId) {
             return res.status(400).json({
                 success: false,
-                message: "studentId and newRoomId are required",
+                message: "newRoomId is required",
             });
         }
 
-        const student = await Student.findOne({ studentId });
+        const student = await Student.findById(id);
         if (!student) {
             return res.status(404).json({
                 success: false,
@@ -165,21 +166,22 @@ export const changeRoom = async (req, res) => {
 };
 
 /**
- * PATCH /students/transfer
+ * PATCH /students/:id/transfer
  * Transfer a student to any available room in a different hostel.
  */
 export const transferStudent = async (req, res) => {
     try {
-        const { studentId, newHostelId } = req.body;
+        const { id } = req.params;       // MongoDB _id of the student
+        const { newHostelId } = req.body;
 
-        if (!studentId || !newHostelId) {
+        if (!newHostelId) {
             return res.status(400).json({
                 success: false,
-                message: "studentId and newHostelId are required",
+                message: "newHostelId is required",
             });
         }
 
-        const student = await Student.findOne({ studentId });
+        const student = await Student.findById(id);
         if (!student) {
             return res.status(404).json({
                 success: false,
