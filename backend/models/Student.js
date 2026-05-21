@@ -1,22 +1,25 @@
+import mongoose from "mongoose";
+
 const studentSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
     },
     lastname: {
         type: String,
-        required: true,
-        trim: true
+        trim: true,       // optional — controller doesn't require it
     },
     studentId: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
     },
     room: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Room",
-        required: true
-    }
+        required: true,
+    },
 }, { timestamps: true });
+
+export default mongoose.model("Student", studentSchema);

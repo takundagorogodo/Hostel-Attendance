@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 const roomSchema = new mongoose.Schema({
     roomNumber: {
         type: String,
@@ -23,3 +25,5 @@ const roomSchema = new mongoose.Schema({
         }
     ]
 }, { timestamps: true });
+
+export default mongoose.model("Room",roomSchema);
