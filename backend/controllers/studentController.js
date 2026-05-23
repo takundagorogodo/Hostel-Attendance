@@ -1,15 +1,14 @@
 import Student from "../models/Student.js";
 import Room from "../models/Room.js";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
 const serverError = (res, err) =>
-    res.status(500).json({ success: false, message: err.message });
+    res.status(500).json(
+        { 
+            success: false, 
+            message: err.message 
+        }
+    );
 
-/**
- * Remove a student from their current room.
- * No-op if the student has no assigned room.
- */
 const detachFromRoom = async (student) => {
     if (!student.room) return;
     const room = await Room.findById(student.room);
@@ -19,12 +18,6 @@ const detachFromRoom = async (student) => {
     }
 };
 
-// ─── Controllers ─────────────────────────────────────────────────────────────
-
-/**
- * POST /students
- * Enroll a new student and assign them to a room.
- */
 export const addStudent = async (req, res) => {
     try {
         const { name, studentId, roomId } = req.body;
@@ -74,10 +67,6 @@ export const addStudent = async (req, res) => {
     }
 };
 
-/**
- * DELETE /students/:id
- * Permanently remove a student and vacate their room slot.
- */
 export const deleteStudent = async (req, res) => {
     try {
         const { id } = req.params;
@@ -102,13 +91,9 @@ export const deleteStudent = async (req, res) => {
     }
 };
 
-/**
- * PATCH /students/:id/room
- * Move a student to a different room within the same hostel.
- */
 export const changeRoom = async (req, res) => {
     try {
-        const { id } = req.params;       // MongoDB _id of the student
+        const { id } = req.params;       
         const { newRoomId } = req.body;
 
         if (!newRoomId) {
@@ -165,13 +150,9 @@ export const changeRoom = async (req, res) => {
     }
 };
 
-/**
- * PATCH /students/:id/transfer
- * Transfer a student to any available room in a different hostel.
- */
 export const transferStudent = async (req, res) => {
     try {
-        const { id } = req.params;       // MongoDB _id of the student
+        const { id } = req.params;       
         const { newHostelId } = req.body;
 
         if (!newHostelId) {
