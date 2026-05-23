@@ -63,14 +63,13 @@ export const globalErrorHandler = (err, req, res, next) => {
         return sendDevError(err, res);
     }
 
-    // Normalize known error types into AppErrors
     let error = Object.assign(Object.create(Object.getPrototypeOf(err)), err);
 
-    if (err.name === "CastError")                error = handleCastError(err);
-    if (err.name === "ValidationError")          error = handleValidationError(err);
-    if (err.code === 11000)                      error = handleDuplicateKeyError(err);
-    if (err.name === "JsonWebTokenError")        error = handleJWTError();
-    if (err.name === "TokenExpiredError")        error = handleJWTExpiredError();
+    if (err.name === "CastError")   error = handleCastError(err);
+    if (err.name === "ValidationError")  error = handleValidationError(err);
+    if (err.code === 11000)    error = handleDuplicateKeyError(err);
+    if (err.name === "JsonWebTokenError")   error = handleJWTError();
+    if (err.name === "TokenExpiredError")  error = handleJWTExpiredError();
 
     return sendProdError(error, res);
 };
