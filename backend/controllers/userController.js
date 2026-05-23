@@ -2,8 +2,6 @@
 import bcrypt from "bcrypt";
 import User from "../models/User.js";
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
-
 const SALT_ROUNDS = 10;
 
 const stripPassword = (doc) => {
@@ -12,14 +10,13 @@ const stripPassword = (doc) => {
 };
 
 const serverError = (res, err) =>
-    res.status(500).json({ success: false, message: err.message });
+    res.status(500).json(
+        { 
+            success: false, 
+            message: err.message 
+        }
+    );
 
-// ─── Admin: Warden Management ────────────────────────────────────────────────
-
-/**
- * POST /wardens
- * Create a new warden account (admin only).
- */
 export const createWarden = async (req, res) => {
     try {
         const { username, password, role = "warden" } = req.body;
@@ -52,10 +49,6 @@ export const createWarden = async (req, res) => {
     }
 };
 
-/**
- * DELETE /wardens/:id
- * Soft-delete a warden by ID (admin only).
- */
 export const deleteWardenByAdmin = async (req, res) => {
     try {
         const { id } = req.params;
@@ -87,10 +80,6 @@ export const deleteWardenByAdmin = async (req, res) => {
     }
 };
 
-/**
- * PATCH /wardens/:id
- * Update a warden's username (admin only).
- */
 export const updateWardenByAdmin = async (req, res) => {
     try {
         const { id } = req.params;
