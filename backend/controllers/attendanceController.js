@@ -1,23 +1,14 @@
 import Attendance from "../models/Attendance.js";
 import Student from "../models/Student.js";
 
-// ─── Constants ────────────────────────────────────────────────────────────────
 
 const VALID_STATUSES = ["present", "absent"];
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const serverError = (res, err) =>
     res.status(500).json({ success: false, message: err.message });
 
 const todayISO = () => new Date().toISOString().split("T")[0];
 
-// ─── Controllers ──────────────────────────────────────────────────────────────
-
-/**
- * POST /attendance/:id
- * Mark attendance for a student for the current day.
- */
 export const markAttendance = async (req, res) => {
     try {
         const { id } = req.params;
