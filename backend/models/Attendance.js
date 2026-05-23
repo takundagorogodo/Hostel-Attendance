@@ -7,7 +7,7 @@ const attendanceSchema = new mongoose.Schema({
         required: true
     },
     date: {
-        type: String,   // e.g. "2026-05-19"
+        type: String,   
         required: true
     },
     status: {
@@ -17,7 +17,6 @@ const attendanceSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-// 🔥 prevent duplicate attendance per day
 attendanceSchema.index({ student: 1, date: 1 }, { unique: true });
 
 export default mongoose.model("Attendance", attendanceSchema);
