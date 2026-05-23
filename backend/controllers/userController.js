@@ -121,12 +121,6 @@ export const updateWardenByAdmin = async (req, res) => {
     }
 };
 
-// ─── Admin: Self-Update ──────────────────────────────────────────────────────
-
-/**
- * PATCH /admin/me
- * Update the authenticated admin's username and/or password.
- */
 export const updateAdmin = async (req, res) => {
     try {
         const { username, password } = req.body;
@@ -165,12 +159,7 @@ export const updateAdmin = async (req, res) => {
     }
 };
 
-// ─── Warden: Self-Update ─────────────────────────────────────────────────────
 
-/**
- * PATCH /warden/me
- * Update the authenticated warden's password.
- */
 export const updateWardenByWarden = async (req, res) => {
     try {
         const { password } = req.body;
