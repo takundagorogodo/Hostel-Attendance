@@ -5,7 +5,12 @@ import Student from "../models/Student.js";
 const VALID_STATUSES = ["present", "absent"];
 
 const serverError = (res, err) =>
-    res.status(500).json({ success: false, message: err.message });
+    res.status(500).json(
+        {
+            success: false, 
+            message: err.message 
+        }
+    );
 
 const todayISO = () => new Date().toISOString().split("T")[0];
 
