@@ -8,33 +8,21 @@ import { markAttendance } from "../controllers/attendanceController.js";
 
 const router = express.Router();
 
-// ─── Auth (public) ────────────────────────────────────────────────────────────
-
 router.post("/auth/login",  login);
 router.post("/auth/logout", verifyToken, logout);
-
-// ─── Admin: Warden Management ─────────────────────────────────────────────────
 
 router.post  ("/wardens",          verifyToken, requireAdmin,  createWarden);
 router.delete("/wardens/:id",      verifyToken, requireAdmin,  deleteWardenByAdmin);
 router.patch ("/wardens/:id",      verifyToken, requireAdmin,  updateWardenByAdmin);
 
-// ─── Admin: Self ──────────────────────────────────────────────────────────────
-
 router.patch ("/admin/me",         verifyToken, requireAdmin,  updateAdmin);
-
-// ─── Admin: Student Management ───────────────────────────────────────────────
 
 router.post  ("/students",              verifyToken, requireStaff,  addStudent);
 router.delete("/students/:id",          verifyToken, requireAdmin,  deleteStudent);
 router.patch ("/students/:id/room",     verifyToken, requireAdmin,  changeRoom);
 router.patch ("/students/:id/transfer", verifyToken, requireAdmin,  transferStudent);
 
-// ─── Warden: Self ────────────────────────────────────────────────────────────
-
 router.patch ("/warden/me",        verifyToken, requireWarden, updateWardenByWarden);
-
-// ─── Shared: Attendance ───────────────────────────────────────────────────────
 
 router.post  ("/attendance/:id",   verifyToken, requireStaff,  markAttendance);
 
