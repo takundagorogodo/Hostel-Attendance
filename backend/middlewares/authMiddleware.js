@@ -1,9 +1,12 @@
 import jwt from "jsonwebtoken";
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
 const unauthorized = (res, message) =>
-    res.status(401).json({ success: false, message });
+    res.status(401).json(
+        { 
+            success: false, 
+            message 
+        }
+    );
 
 const forbidden = (res, message) =>
     res.status(403).json(
