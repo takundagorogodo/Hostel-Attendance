@@ -9,8 +9,6 @@ dotenv.config();
 
 const app = express();
 
-// ─── Core Middleware ──────────────────────────────────────────────────────────
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -21,16 +19,10 @@ app.use(cors({
     allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
-// ─── Routes ───────────────────────────────────────────────────────────────────
-
 app.use("/api", mainRoutes);
-
-// ─── Error Handling ───────────────────────────────────────────────────────────
 
 app.use(notFound);
 app.use(globalErrorHandler);
-
-// ─── DB + Export ──────────────────────────────────────────────────────────────
 
 await connectDb();
 
