@@ -8,7 +8,7 @@ const studentSchema = new mongoose.Schema({
     },
     lastname: {
         type: String,
-        trim: true,       // optional — controller doesn't require it
+        trim: true,     
     },
     studentId: {
         type: String,
