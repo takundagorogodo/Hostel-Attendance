@@ -1,64 +1,35 @@
-import Attendance from "../models/Attendance.js";
-import Student from "../models/Student.js";
-
-
-const VALID_STATUSES = ["present", "absent"];
-
-const serverError = (res, err) =>
-    res.status(500).json(
-        {
-            success: false, 
-            message: err.message 
-        }
-    );
-
-const todayISO = () => new Date().toISOString().split("T")[0];
+import { markAttendanceService, getAttendanceReportService, getAttendanceSummaryService } from '../services/attendanceService.js';
+import { AppError } from '../utils/appError.js';
+import logger from '../utils/logger.js';
 
 export const markAttendance = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { status } = req.body;
+  try {
+    const attendance = await markAttendanceService(req.params.id, req.body.status);
+    res.status(201).json({ success: true, message: 'Attendance marked successfully', attendance });
+  } catch (err) {
+    if (err instanceof AppError) return res.status(err.statusCode).json({ success: false, message: err.message });
+    logger.error('Mark attendance error:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
 
-        if (!status) {
-            return res.status(400).json({
-                success: false,
-                message: "Status is required",
-            });
-        }
+export const getAttendanceReport = async (req, res) => {
+  try {
+    const { studentId, date, startDate, endDate } = req.query;
+    const records = await getAttendanceReportService({ studentId, date, startDate, endDate });
+    res.status(200).json({ success: true, count: records.length, records });
+  } catch (err) {
+    logger.error('Get attendance report error:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
 
-        if (!VALID_STATUSES.includes(status)) {
-            return res.status(400).json({
-                success: false,
-                message: `Status must be one of: ${VALID_STATUSES.join(", ")}`,
-            });
-        }
-
-        const student = await Student.findById(id);
-        if (!student) {
-            return res.status(404).json({
-                success: false,
-                message: "Student not found",
-            });
-        }
-
-        const today = todayISO();
-
-        const existing = await Attendance.findOne({ student: id, date: today });
-        if (existing) {
-            return res.status(409).json({
-                success: false,
-                message: "Attendance already marked for today",
-            });
-        }
-
-        const attendance = await Attendance.create({ student: id, date: today, status });
-
-        return res.status(201).json({
-            success: true,
-            message: "Attendance marked successfully",
-            attendance,
-        });
-    } catch (err) {
-        return serverError(res, err);
-    }
+export const getAttendanceSummary = async (req, res) => {
+  try {
+    const summary = await getAttendanceSummaryService();
+    res.status(200).json({ success: true, summary });
+  } catch (err) {
+    logger.error('Get attendance summary error:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
 };
