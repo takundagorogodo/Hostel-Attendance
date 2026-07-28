@@ -1,29 +1,16 @@
-import express from "express";
-
-import { verifyToken, requireAdmin, requireWarden, requireStaff } from "../middlewares/authMiddleware.js";
-import { login, logout } from "../controllers/authController.js";
-import { createWarden, deleteWardenByAdmin, updateWardenByAdmin, updateAdmin, updateWardenByWarden } from "../controllers/userController.js";
-import { addStudent, deleteStudent, changeRoom, transferStudent } from "../controllers/studentController.js";
-import { markAttendance } from "../controllers/attendanceController.js";
+import express from 'express';
+import authRoutes from './authRoutes.js';
+import userRoutes from './userRoutes.js';
+import studentRoutes from './studentRoutes.js';
+import attendanceRoutes from './attendanceRoutes.js';
+import reportRoutes from './reportRoutes.js';
 
 const router = express.Router();
 
-router.post("/auth/login",  login);
-router.post("/auth/logout", verifyToken, logout);
-
-router.post  ("/wardens",          verifyToken, requireAdmin,  createWarden);
-router.delete("/wardens/:id",      verifyToken, requireAdmin,  deleteWardenByAdmin);
-router.patch ("/wardens/:id",      verifyToken, requireAdmin,  updateWardenByAdmin);
-
-router.patch ("/admin/me",         verifyToken, requireAdmin,  updateAdmin);
-
-router.post  ("/students",              verifyToken, requireStaff,  addStudent);
-router.delete("/students/:id",          verifyToken, requireAdmin,  deleteStudent);
-router.patch ("/students/:id/room",     verifyToken, requireAdmin,  changeRoom);
-router.patch ("/students/:id/transfer", verifyToken, requireAdmin,  transferStudent);
-
-router.patch ("/warden/me",        verifyToken, requireWarden, updateWardenByWarden);
-
-router.post  ("/attendance/:id",   verifyToken, requireStaff,  markAttendance);
+router.use('/auth', authRoutes);
+router.use('/users', userRoutes);
+router.use('/students', studentRoutes);
+router.use('/attendance', attendanceRoutes);
+router.use('/reports', reportRoutes);
 
 export default router;
