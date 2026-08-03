@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+  body {
+    @apply bg-[#f0f8ff] text-textPrimary dark:bg-[#0f0f1a] dark:text-textInverted transition-colors duration-300;
+    font-feature-settings: "ss01", "ss02";
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/20 dark:bg-white/5 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-3xl shadow-glass dark:shadow-glass-dark;
+  }
+  .neumorphic-card {
+    @apply bg-[#e0e5ec] dark:bg-[#16162a] rounded-3xl shadow-neumorphic dark:shadow-neumorphic-dark border-none;
+  }
+  .glass-btn {
+    @apply bg-white/10 dark:bg-white/5 backdrop-blur-md border border-white/20 dark:border-white/10 rounded-2xl px-6 py-3 font-semibold text-sm transition hover:bg-white/20 dark:hover:bg-white/10 active:scale-[0.97];
+  }
+  .neumorphic-btn {
+    @apply bg-[#e0e5ec] dark:bg-[#16162a] rounded-2xl px-6 py-3 font-semibold text-sm shadow-[8px_8px_16px_#bec8d1,-8px_-8px_16px_#ffffff] dark:shadow-[8px_8px_16px_#0a0a14,-8px_-8px_16px_#2a2a42] transition hover:brightness-105 active:scale-[0.98];
+  }
+  .noise-overlay {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+}
