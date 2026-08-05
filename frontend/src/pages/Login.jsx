@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Lock, User, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useNavigate } from 'react-router-dom';
+import { setAuthToken } from '../utils/api.js';
 import GlassCard from '../components/GlassCard.jsx';
 import NeumorphicButton from '../components/NeumorphicButton.jsx';
 
@@ -25,6 +26,7 @@ export default function Login() {
         token: 'mock-jwt-token-123',
       };
       login(mockUser);
+      setAuthToken(mockUser.token);
       navigate('/dashboard');
     } catch (err) {
       setError('Login failed. Check your credentials.');
