@@ -1,196 +1,88 @@
-
-import bcrypt from "bcrypt";
-import User from "../models/User.js";
-
-const SALT_ROUNDS = 10;
+import { createWardenService, deleteWardenService, updateWardenService, updateAdminService, updateWardenProfileService, registerStudentService } from '../services/userService.js';
+import { AppError } from '../utils/appError.js';
+import logger from '../utils/logger.js';
 
 const stripPassword = (doc) => {
-    const { password: _omit, ...safeDoc } = doc._doc ?? doc;
-    return safeDoc;
+  const obj = doc.toObject ? doc.toObject() : doc;
+  const { password: _, ...rest } = obj;
+  return rest;
 };
 
-const serverError = (res, err) =>
-    res.status(500).json(
-        { 
-            success: false, 
-            message: err.message 
-        }
-    );
-
 export const createWarden = async (req, res) => {
-    try {
-        const { username, password, role = "warden" } = req.body;
-
-        if (!username || !password) {
-            return res.status(400).json({
-                success: false,
-                message: "Username and password are required",
-            });
-        }
-
-        const existingUser = await User.findOne({ username });
-        if (existingUser) {
-            return res.status(409).json({
-                success: false,
-                message: "A user with that username already exists",
-            });
-        }
-
-        const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
-        const user = await User.create({ username, password: hashedPassword, role });
-
-        return res.status(201).json({
-            success: true,
-            message: "Warden created successfully",
-            user: stripPassword(user),
-        });
-    } catch (err) {
-        return serverError(res, err);
-    }
+  try {
+    const { username, password, role = 'warden' } = req.body;
+    if (!username || !password) return res.status(400).json({ success: false, message: 'Username and password are required' });
+    const user = await createWardenService(username, password, role);
+    res.status(201).json({ success: true, message: 'Warden created successfully', user: stripPassword(user) });
+  } catch (err) {
+    if (err instanceof AppError) return res.status(err.statusCode).json({ success: false, message: err.message });
+    logger.error('Create warden error:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
 };
 
 export const deleteWardenByAdmin = async (req, res) => {
-    try {
-        const { id } = req.params;
-
-        const user = await User.findById(id);
-        if (!user || user.role !== "warden") {
-            return res.status(404).json({
-                success: false,
-                message: "Warden not found",
-            });
-        }
-
-        if (user.isDeleted) {
-            return res.status(409).json({
-                success: false,
-                message: "Warden is already deleted",
-            });
-        }
-
-        user.isDeleted = true;
-        await user.save();
-
-        return res.status(200).json({
-            success: true,
-            message: "Warden deleted successfully",
-        });
-    } catch (err) {
-        return serverError(res, err);
-    }
+  try {
+    const user = await deleteWardenService(req.params.id);
+    res.status(200).json({ success: true, message: 'Warden deleted successfully' });
+  } catch (err) {
+    if (err instanceof AppError) return res.status(err.statusCode).json({ success: false, message: err.message });
+    res.status(500).json({ success: false, message: err.message });
+  }
 };
 
 export const updateWardenByAdmin = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { username } = req.body;
-
-        if (!username) {
-            return res.status(400).json({
-                success: false,
-                message: "Username is required",
-            });
-        }
-
-        const user = await User.findById(id);
-        if (!user || user.role !== "warden") {
-            return res.status(404).json({
-                success: false,
-                message: "Warden not found",
-            });
-        }
-
-        const duplicate = await User.findOne({ username, _id: { $ne: id } });
-        if (duplicate) {
-            return res.status(409).json({
-                success: false,
-                message: "That username is already taken",
-            });
-        }
-
-        user.username = username;
-        const updatedUser = await user.save();
-
-        return res.status(200).json({
-            success: true,
-            message: "Warden username updated successfully",
-            user: stripPassword(updatedUser),
-        });
-    } catch (err) {
-        return serverError(res, err);
-    }
+  try {
+    const { username } = req.body;
+    if (!username) return res.status(400).json({ success: false, message: 'Username is required' });
+    const user = await updateWardenService(req.params.id, username);
+    res.status(200).json({ success: true, message: 'Warden username updated successfully', user: stripPassword(user) });
+  } catch (err) {
+    if (err instanceof AppError) return res.status(err.statusCode).json({ success: false, message: err.message });
+    res.status(500).json({ success: false, message: err.message });
+  }
 };
 
 export const updateAdmin = async (req, res) => {
-    try {
-        const { username, password } = req.body;
-
-        if (!username && !password) {
-            return res.status(400).json({
-                success: false,
-                message: "At least one field (username or password) is required",
-            });
-        }
-
-        const updateData = {};
-        if (username) updateData.username = username;
-        if (password) updateData.password = await bcrypt.hash(password, SALT_ROUNDS);
-
-        const updatedAdmin = await User.findByIdAndUpdate(
-            req.user.id,
-            updateData,
-            { new: true }
-        );
-
-        if (!updatedAdmin) {
-            return res.status(404).json({
-                success: false,
-                message: "Admin account not found",
-            });
-        }
-
-        return res.status(200).json({
-            success: true,
-            message: "Admin profile updated successfully",
-            user: stripPassword(updatedAdmin),
-        });
-    } catch (err) {
-        return serverError(res, err);
-    }
+  try {
+    const { username, password } = req.body;
+    if (!username && !password) return res.status(400).json({ success: false, message: 'At least one field is required' });
+    const updated = await updateAdminService(req.user.id, { username, password });
+    res.status(200).json({ success: true, message: 'Admin profile updated successfully', user: stripPassword(updated) });
+  } catch (err) {
+    if (err instanceof AppError) return res.status(err.statusCode).json({ success: false, message: err.message });
+    res.status(500).json({ success: false, message: err.message });
+  }
 };
 
-
 export const updateWardenByWarden = async (req, res) => {
-    try {
-        const { password } = req.body;
+  try {
+    const { password } = req.body;
+    if (!password) return res.status(400).json({ success: false, message: 'Password is required' });
+    const updated = await updateWardenProfileService(req.user.id, password);
+    res.status(200).json({ success: true, message: 'Password updated successfully', user: stripPassword(updated) });
+  } catch (err) {
+    if (err instanceof AppError) return res.status(err.statusCode).json({ success: false, message: err.message });
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
 
-        if (!password) {
-            return res.status(400).json({
-                success: false,
-                message: "Password is required",
-            });
-        }
-
-        const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
-
-        const updatedUser = await User.findByIdAndUpdate(
-            req.user.id,
-            { password: hashedPassword },
-            { new: true }
-        );
-
-        if (!updatedUser) {
-            return res.status(404).json({
-                success: false,
-                message: "Warden account not found",
-            });
-        }
-
-        return res.status(200).json({
-            success: true,
-            message: "Password updated successfully",
-        });
-    } catch (err) {
-        return serverError(res, err);
+export const registerStudent = async (req, res) => {
+  try {
+    const { username, password, studentProfile } = req.body;
+    if (!username || !password || !studentProfile) {
+      return res.status(400).json({ success: false, message: 'Username, password, and student profile are required' });
     }
+    const result = await registerStudentService({ username, password, studentProfile });
+    res.status(201).json({
+      success: true,
+      message: 'Student registered successfully',
+      user: stripPassword(result.user),
+      student: result.student,
+    });
+  } catch (err) {
+    if (err instanceof AppError) return res.status(err.statusCode).json({ success: false, message: err.message });
+    logger.error('Register student error:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
 };
