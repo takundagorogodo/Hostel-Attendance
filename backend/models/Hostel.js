@@ -5,7 +5,7 @@ const hostelSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    enum: ['Mulphry', 'Hollandian', 'Doge', 'Complex', 'Ngonyamo'],
+    enum: ['Mulphry', 'Hollandia', 'Dodge', 'New Complex', 'Ngonyamo'],
     trim: true,
   },
   floors: {
@@ -19,7 +19,5 @@ const hostelSchema = new mongoose.Schema({
     default: '',
   },
 }, { timestamps: true });
-
-hostelSchema.index({ name: 1 });
 
 export default mongoose.model('Hostel', hostelSchema);
