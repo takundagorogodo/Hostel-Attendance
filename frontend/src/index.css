@@ -15,6 +15,7 @@
 @layer components {
   .glass-card {
     @apply bg-white/20 dark:bg-white/5 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-3xl shadow-glass dark:shadow-glass-dark;
+    animation: glassFadeIn 0.6s ease-out both;
   }
   .neumorphic-card {
     @apply bg-[#e0e5ec] dark:bg-[#16162a] rounded-3xl shadow-neumorphic dark:shadow-neumorphic-dark border-none;
@@ -28,5 +29,16 @@
   .noise-overlay {
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
     pointer-events: none;
+  }
+}
+
+@keyframes glassFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
